@@ -1,0 +1,19 @@
+diff --git a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
+--- a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
++++ b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
+@@ -589,6 +589,16 @@
+ bool AmlogicGrabber::isVideoPlayingAML()
+ {
++	// An enabled video layer survives decoder teardown. Its capture device can
++	// keep returning the last picture, so also require a current decoded frame.
++	QFile width("/sys/class/video/frame_width");
++	QFile height("/sys/class/video/frame_height");
++	if (!width.open(QIODevice::ReadOnly) || !height.open(QIODevice::ReadOnly) ||
++		width.readAll().trimmed().toInt() <= 0 ||
++		height.readAll().trimmed().toInt() <= 0)
++	{
++		return false;
++	}
+ 	if (QFile::exists(DEFAULT_VIDEO_DEVICE))
+ 	{
+ 		int videoDisabled = 1;

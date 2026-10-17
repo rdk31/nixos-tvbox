@@ -1,0 +1,24 @@
+diff --git a/src/video/aml.c b/src/video/aml.c
+index 834671b..6ffc310 100644
+--- a/src/video/aml.c
++++ b/src/video/aml.c
+@@ -128,6 +128,19 @@ int aml_setup(int videoFormat, int width, int height, int redrawRate, void* cont
+     return -2;
+   }
+ 
++  // Match CoreELEC Kodi's initialization of the libamcodec control path.
++  // Without it, the frame parser accepts SPS/PPS data but never releases
++  // pictures, eventually filling the input buffer.
++  codec_pause(&codecParam);
++  codec_set_cntl_mode(&codecParam, 0);
++  codec_set_video_delay_limited_ms(&codecParam, 1000);
++  codec_set_cntl_avthresh(&codecParam, 90000 * 30);
++  codec_set_cntl_syncthresh(&codecParam, 0);
++  codec_set_cntl_mode(&codecParam, 0);
++  // The pause above is only for control initialization. Release it before
++  // Moonlight starts feeding frames to the decoder.
++  codec_resume(&codecParam);
++
+   if ((ret = codec_set_freerun_mode(&codecParam, 1)) != 0) {
+     fprintf(stderr, "Can't set Freerun mode: %x\n", ret);
+     return -2;

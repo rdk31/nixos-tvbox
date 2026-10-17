@@ -1,0 +1,135 @@
+diff --git a/include/grabber/linux/amlogic/AmlogicGrabber.h b/include/grabber/linux/amlogic/AmlogicGrabber.h
+index 46e9ebf..d26f05e 100644
+--- a/include/grabber/linux/amlogic/AmlogicGrabber.h
++++ b/include/grabber/linux/amlogic/AmlogicGrabber.h
+@@ -65,6 +65,8 @@ private:
+ 	bool grabFrameFramebuffer();
+ 	bool getAspectRatio(int& arW, int& arH);
+ 	bool setCapturedHeight();
++	bool isHdrOutput();
++	void updateHdrToneMappingForSource();
+ 
+ 	MemoryBuffer<uint8_t> _amlFrame;
+ 	MemoryBuffer<uint8_t> _lastValidFrame;
+@@ -73,6 +75,7 @@ private:
+ 	int _videoDev;
+ 	bool _usingAmlogic;
+ 	bool _messageShow;
++	bool _hdrToneMappingConfigured = true;
+ 		
+ private:
+ 	QString		_configurationPath;
+diff --git a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
+index 9f86430..35ec22c 100644
+--- a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
++++ b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
+@@ -54,6 +54,7 @@ namespace {
+ 	const int  AMVIDEOCAP_WAIT_MAX_MS = 40;
+ 	const char DEFAULT_VIDEO_DEVICE[] = "/dev/amvideo";
+ 	const char DEFAULT_CAPTURE_DEVICE[] = "/dev/amvideocap0";
++	const char HDMI_HDR_STATUS[] = "/sys/class/amhdmitx/amhdmitx0/hdmi_hdr_status";
+ }
+ 
+ 
+@@ -71,5 +72,7 @@ AmlogicGrabber::AmlogicGrabber(const QString& device, const QString& configurati
+ {
+ 	resetVariables();
++	loadLutFile(PixelFormat::RGB24);
++	updateHdrToneMappingForSource();
+ 
+ 	_timer.setTimerType(Qt::PreciseTimer);
+ 	connect(&_timer, &QTimer::timeout, this, &AmlogicGrabber::grabFrame);
+@@ -99,7 +102,10 @@ void AmlogicGrabber::loadLutFile(PixelFormat color)
+ 	QString userLut = QString("%1/lut_lin_tables.3d").arg(_configurationPath);
+ 	QString sharedLut = QString("%1/lut_lin_tables.3d").arg(GetSharedLut());
+ 
++	const int activeMode = _hdrToneMappingEnabled;
++	_hdrToneMappingEnabled = 1;
+ 	Grabber::loadLutFile(_log, color, QList<QString>{userLut, sharedLut});
++	_hdrToneMappingEnabled = activeMode;
+ }
+ 
+ void AmlogicGrabber::setHdrToneMappingEnabled(int mode)
+@@ -106,26 +112,44 @@ void AmlogicGrabber::loadLutFile(PixelFormat color)
+ 
+ void AmlogicGrabber::setHdrToneMappingEnabled(int mode)
+ {
+-	if (_hdrToneMappingEnabled != mode || _lut.data() == nullptr)
++	const bool configured = mode != 0;
++	if (_hdrToneMappingConfigured != configured || (_lut.data() == nullptr && configured))
+ 	{
+-		_hdrToneMappingEnabled = mode;
+-
+-		if (_lut.data() != nullptr || !mode)
+-			Debug(_log, "setHdrToneMappingMode to: {:s}", (mode == 0) ? "Disabled" : "Enabled");
+-		else
+-			Warning(_log, "setHdrToneMappingMode to: enable, but the LUT file is currently unloaded");
++		_hdrToneMappingConfigured = configured;
+ 
+-		loadLutFile(PixelFormat::RGB24);
++		if (configured && _lut.data() == nullptr)
++			loadLutFile(PixelFormat::RGB24);
++		updateHdrToneMappingForSource();
+ 		emit SignalSetNewComponentStateToAllInstances(
+ 			hyperhdr::Components::COMP_HDR,
+-			(mode != 0));
++			configured);
+ 	}
+ 	else
+ 	{
+-		Debug(_log, "setHdrToneMappingMode nothing changed: {:s}", (mode == 0) ? "Disabled" : "Enabled");
++		Debug(_log, "HDR tone mapping configuration unchanged: {:s}", configured ? "Enabled" : "Disabled");
+ 	}
+ }
+ 
++bool AmlogicGrabber::isHdrOutput()
++{
++	QFile status(HDMI_HDR_STATUS);
++	if (!status.open(QIODevice::ReadOnly))
++		return false;
++
++	const QByteArray value = status.readAll().trimmed();
++	return !value.isEmpty() && value != "SDR";
++}
++
++void AmlogicGrabber::updateHdrToneMappingForSource()
++{
++	const int active = (_hdrToneMappingConfigured && isHdrOutput()) ? 1 : 0;
++	if (_hdrToneMappingEnabled != active)
++	{
++		_hdrToneMappingEnabled = active;
++		Info(_log, "HDR tone mapping is now {:s} for the current HDMI output", active ? "active" : "inactive");
++	}
++}
++
+ bool AmlogicGrabber::getAspectRatio(int& arW, int& arH)
+ {
+ 	QFile fw("/sys/class/video/frame_width");
+@@ -326,6 +343,7 @@ void AmlogicGrabber::grabFrame()
+ 		try {
+ 			if (_initialized) {				
+ 				bool isVideoPlaying = isVideoPlayingAML();
++				updateHdrToneMappingForSource();
+ 
+ 				// Change capture device when needed
+ 				if (isVideoPlaying != _usingAmlogic) {
+@@ -352,13 +370,12 @@ void AmlogicGrabber::grabFrame()
+ 					}
+ 					grabFrameAmlogic();
+ 				}
+-				else {
++				else if (!_messageShow) {
+-					if (!_messageShow)
+-					{
+-						Info(_log, "Grabbing Framebuffer");
+-						_messageShow = true;
+-					}
+-					grabFrameFramebuffer();
++					Info(_log, "No decoded video is active; suppressing the framebuffer because it is not the Kodi DRM plane");
++					_messageShow = true;
++					Image<ColorRgb> black(_width, _height);
++					memset(black.rawMem(), 0, black.size());
++					emit SignalNewCapturedFrame(black);
+ 				}
+ 			}
+ 		}

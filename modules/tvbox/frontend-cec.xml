@@ -1,0 +1,6 @@
+<settings>
+  <!-- Leaving Kodi for another frontend must not power off or deselect the TV. -->
+  <setting id="standby_devices" value="231" />
+  <setting id="standby_tv_on_pc_standby" value="0" />
+  <setting id="send_inactive_source" value="0" />
+</settings>

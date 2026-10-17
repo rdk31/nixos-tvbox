@@ -1,0 +1,118 @@
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 648ca5c..867a442 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -43,6 +43,7 @@
+ #include <sys/poll.h>
+ #include <chrono>
+ #include <thread>
++#include <fstream>
+ #include "aom_integer.h"
+ #include "obu_util.h"
+ 
+@@ -1943,6 +1944,7 @@ CAMLCodec::CAMLCodec(CProcessInfo &processInfo)
+ 
+ CAMLCodec::~CAMLCodec()
+ {
++  RestoreVideoCrop();
+   delete am_private;
+   am_private = NULL;
+   delete m_dll, m_dll = NULL;
+@@ -2320,6 +2322,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamInfo &hints, bool doviIsFEL)
+   CSysfsPath("/sys/class/video/freerun_mode", 1);
+ 
+   m_opened = true;
++  ApplyVideoCrop();
+   // vcodec is open, update speed if it was
+   // changed before VideoPlayer called OpenDecoder.
+   SetSpeed(m_speed);
+@@ -2473,9 +2476,68 @@ void CAMLCodec::CloseDecoder()
+ 
+   ShowMainVideo(false);
+ 
++  RestoreVideoCrop();
+   CloseAmlVideo();
+ }
+ 
++void CAMLCodec::ApplyVideoCrop()
++{
++  // Some progressive H.264 streams with heights not divisible by eight show
++  // repeated bottom lines on this Amlogic pipeline. Mask the strip using the
++  // padding to the next 16-row macroblock (804 -> 12), as verified on playback.
++  // This is a display workaround: it can also remove valid picture rows.
++  // Leave ordinary 720/1080-line video, interlaced, rotated and 3D video alone.
++  if (am_private->video_format != VFORMAT_H264 || m_hints.height <= 16 ||
++      m_hints.height % 8 == 0 || m_hints.interlaced ||
++      (m_hints.codecOptions & CODEC_INTERLACED) || m_hints.orientation != 0 ||
++      (!m_hints.stereo_mode.empty() && m_hints.stereo_mode != "mono") ||
++      !m_originalVideoCrop.empty())
++    return;
++
++  int top, left, bottom, right;
++  std::ifstream currentCrop("/sys/class/video/crop");
++  if (!(currentCrop >> top >> left >> bottom >> right) ||
++      top < 0 || left < 0 || bottom < 0 || right < 0)
++  {
++    CLog::Log(LOGWARNING, "CAMLCodec: cannot read video crop for H.264 workaround");
++    return;
++  }
++
++  // The driver's crop order is top, left, bottom, right. Preserve existing
++  // crops, and do not add padding a second time to an already cropped picture.
++  const int bottomPadding = 16 - m_hints.height % 16;
++  if (bottom >= bottomPadding || top + bottomPadding >= m_hints.height)
++    return;
++
++  std::ofstream crop("/sys/class/video/crop");
++  crop << StringUtils::Format("{} {} {} {}", top, left, bottomPadding, right) << std::endl;
++  if (!crop)
++  {
++    CLog::Log(LOGWARNING, "CAMLCodec: cannot write video crop for H.264 workaround");
++    return;
++  }
++
++  m_originalVideoCrop = StringUtils::Format("{} {} {} {}", top, left, bottom, right);
++  CLog::Log(LOGINFO, "CAMLCodec: masking {} bottom rows for H.264 height {}",
++            bottomPadding, m_hints.height);
++}
++
++void CAMLCodec::RestoreVideoCrop()
++{
++  if (m_originalVideoCrop.empty())
++    return;
++
++  std::ofstream crop("/sys/class/video/crop");
++  crop << m_originalVideoCrop << std::endl;
++  if (!crop)
++  {
++    CLog::Log(LOGWARNING, "CAMLCodec: cannot restore video crop");
++    return;
++  }
++
++  m_originalVideoCrop.clear();
++}
++
+ void CAMLCodec::CloseAmlVideo()
+ {
+   m_amlVideoFile.reset();
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+index c0b6d70..5bd9854 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.h
+@@ -93,6 +93,8 @@ private:
+   void          SetVideoContrast(const int contrast);
+   void          SetVideoBrightness(const int brightness);
+   void          SetVideoSaturation(const int saturation);
++  void          ApplyVideoCrop();
++  void          RestoreVideoCrop();
+   bool          OpenAmlVideo(const CDVDStreamInfo &hints);
+   void          CloseAmlVideo();
+   std::string   GetVfmMap(const std::string &name);
+@@ -130,6 +132,7 @@ private:
+ 
+   PosixFilePtr     m_amlVideoFile;
+   std::string      m_defaultVfmMap;
++  std::string      m_originalVideoCrop;
+ 
+   static std::atomic_flag  m_pollSync;
+   static int m_pollDevice;

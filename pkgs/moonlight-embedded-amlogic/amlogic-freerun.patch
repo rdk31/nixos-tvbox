@@ -1,0 +1,26 @@
+diff --git a/src/platform.c b/src/platform.c
+index 23eb3be..7c19bb4 100644
+--- a/src/platform.c
++++ b/src/platform.c
+@@ -110,7 +110,12 @@ void platform_start(enum platform system) {
+   #ifdef HAVE_AML
+   case AML:
+     write_bool("/sys/class/graphics/fb0/blank", true);
+     write_bool("/sys/class/graphics/fb1/blank", true);
++    // Moonlight sends audio directly to ALSA, outside libamcodec. Match
++    // CoreELEC Kodi's video-only playback setup so tsync cannot hold decoded
++    // frames waiting for an Amlogic audio clock that will never advance.
++    write_bool("/sys/class/tsync/enable", false);
++    write_bool("/sys/class/video/freerun_mode", true);
+     write_bool("/sys/class/video/disable_video", false);
+     break;
+   #endif
+@@ -127,6 +132,8 @@ void platform_stop(enum platform system) {
+   #ifdef HAVE_AML
+   case AML:
+     write_bool("/sys/class/graphics/fb0/blank", false);
+     write_bool("/sys/class/graphics/fb1/blank", false);
++    write_bool("/sys/class/video/freerun_mode", false);
++    write_bool("/sys/class/tsync/enable", true);
+     break;
+   #endif

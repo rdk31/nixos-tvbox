@@ -1,0 +1,26 @@
+diff --git a/xbmc/windowing/amlogic/AMLDisplay.cpp b/xbmc/windowing/amlogic/AMLDisplay.cpp
+index 6697490..444b87a 100644
+--- a/xbmc/windowing/amlogic/AMLDisplay.cpp
++++ b/xbmc/windowing/amlogic/AMLDisplay.cpp
+@@ -592,7 +592,7 @@ int CAMLDRMUtils::get_drmProp(unsigned int id, std::string name, unsigned int ob
+ }
+ 
+ void CAMLDRMUtils::set_drmProp(unsigned int id, std::string name,
+-  unsigned int obj_type, unsigned int value, drmModeAtomicReqPtr req)
++  unsigned int obj_type, uint64_t value, drmModeAtomicReqPtr req)
+ {
+   unsigned int i;
+   drmModeObjectPropertiesPtr props = drmModeObjectGetProperties(m_fd, id, obj_type);
+diff --git a/xbmc/windowing/amlogic/AMLDisplay.h b/xbmc/windowing/amlogic/AMLDisplay.h
+index fbe9b82..1ed06e1 100644
+--- a/xbmc/windowing/amlogic/AMLDisplay.h
++++ b/xbmc/windowing/amlogic/AMLDisplay.h
+@@ -110,7 +110,7 @@ private:
+   int aml_get_drmDevice();
+   int get_drmProp(unsigned int id, std::string name, unsigned int obj_type);
+   void set_drmProp(unsigned int id, std::string name,
+-    unsigned int obj_type, unsigned int value, drmModeAtomicReqPtr req);
++    unsigned int obj_type, uint64_t value, drmModeAtomicReqPtr req);
+   bool SupportsFormat(drmModePlane *plane, uint32_t format);
+   int m_fd{-1};
+   int m_width;

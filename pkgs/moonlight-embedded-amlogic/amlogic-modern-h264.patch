@@ -1,0 +1,29 @@
+diff --git a/src/video/aml.c b/src/video/aml.c
+--- a/src/video/aml.c
++++ b/src/video/aml.c
+@@ -87,21 +87,10 @@ int aml_setup(int videoFormat, int width, int height, int redrawRate, void* cont
+   codecParam.video_path         = FRAME_BASE_PATH_TUNNEL_MODE;
+ 
+   if (videoFormat & VIDEO_FORMAT_MASK_H264) {
+-    if (width > 1920 || height > 1080) {
+-      codecParam.video_type = VFORMAT_H264_4K2K;
+-      codecParam.am_sysinfo.format = VIDEO_DEC_FORMAT_H264_4K2K;
+-    } else {
+-      codecParam.video_type = VFORMAT_H264;
+-      codecParam.am_sysinfo.format = VIDEO_DEC_FORMAT_H264;
+-
+-      // Workaround for decoding special case of C1, 1080p, H264
+-      int major, minor;
+-      struct utsname name;
+-      uname(&name);
+-      int ret = sscanf(name.release, "%d.%d", &major, &minor);
+-      if (ret == 2 && !(major > 3 || (major == 3 && minor >= 14)) && width == 1920 && height == 1080)
+-          codecParam.am_sysinfo.param = (void*) UCODE_IP_ONLY_PARAM;
+-    }
++    // Modern multi-instance decoders handle UHD through the normal H.264
++    // format. The legacy H264_4K2K decoder is absent on the S905X5 kernel.
++    codecParam.video_type = VFORMAT_H264;
++    codecParam.am_sysinfo.format = VIDEO_DEC_FORMAT_H264;
+   } else if (videoFormat & VIDEO_FORMAT_MASK_H265) {
+     codecParam.video_type = VFORMAT_HEVC;
+     codecParam.am_sysinfo.format = VIDEO_DEC_FORMAT_HEVC;
