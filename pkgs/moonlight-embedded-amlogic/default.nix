@@ -1,5 +1,4 @@
 {
-  fetchFromGitHub,
   lib,
   makeWrapper,
   moonlight-embedded,
@@ -9,19 +8,6 @@
 
 (moonlight-embedded.override { alsa-lib = alsa-lib-amlogic; }).overrideAttrs (old: {
   pname = "moonlight-embedded-amlogic";
-  version = "2.7.1";
-
-  # 2.7.0 assigns the result of `xml_status(...) != GS_OK` instead of the
-  # actual error code. A Sunshine launch-permission denial therefore looks
-  # successful and Moonlight attempts RTSP without a session URL. 2.7.1 fixes
-  # that error path and includes the corresponding common-client update.
-  src = fetchFromGitHub {
-    owner = "moonlight-stream";
-    repo = "moonlight-embedded";
-    tag = "v2.7.1";
-    hash = "sha256-h+hI9TQUGMI8VDzvnuRGDjxm8D7GuC/L4/0rwTFocgA=";
-    fetchSubmodules = true;
-  };
 
   patches = (old.patches or [ ]) ++ [
     ./amlogic-api-v2.patch

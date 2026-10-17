@@ -8,6 +8,7 @@
   alsa-lib-amlogic,
   bison,
   coreelecSource,
+  crossguid,
   exiv2,
   ffmpeg,
   fmt,
@@ -15,7 +16,6 @@
   libamcodec,
   libbluray,
   libcec,
-  libcrossguid,
   libdovi,
   libmali,
   meson,
@@ -29,7 +29,6 @@
 let
   bluray = callPackage ./overrides/libbluray.nix { inherit libbluray coreelecSource; };
   cec = callPackage ./overrides/libcec.nix { inherit libcec; };
-  crossguid = callPackage ./overrides/libcrossguid.nix { inherit libcrossguid; };
   swigSource = fetchurl {
     url = "https://mirrors.kodi.tv/build-deps/sources/swig-4.5.0.tar.gz";
     hash = "sha512-/vfD25nSiUBkrIze2YncV0/BW4pJfbYjnieOMmYWyQXfjC0qKISPbgh0wXMq+Vh3LVBNqExfBotxmk0ZKkculg==";
@@ -38,6 +37,7 @@ let
     inherit ffmpeg;
     alsa-lib = alsa-lib-amlogic;
     libcec = cec;
+    libcrossguid = crossguid;
   };
   kodi = kodiBase.overrideAttrs (
     finalAttrs: old: {
@@ -85,7 +85,6 @@ let
           ]
         ) old.buildInputs
         ++ [
-          crossguid
           exiv2
           fmt
           libamcodec
