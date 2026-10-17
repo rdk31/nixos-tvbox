@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     coreelec = {
-      url = "github:CoreELEC/CoreELEC/d854e773674cbb9de658b1f92f2a5c1af02af01d";
+      url = "github:CoreELEC/CoreELEC/8c82dbaa6160b20806917556979b2dd964a251de";
       flake = false;
     };
     coreelec-linux-amlogic = {
@@ -37,7 +37,7 @@
       flake = false;
     };
     coreelec-kodi = {
-      url = "github:CoreELEC/xbmc/726799f46fe88ecaca91bfd9a47fa8a748ca4f2e";
+      url = "github:CoreELEC/xbmc/9f61cca98636d13425101779a2cffccbfd964f47";
       flake = false;
     };
 

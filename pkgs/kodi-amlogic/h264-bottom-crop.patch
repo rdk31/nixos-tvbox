@@ -43,7 +43,7 @@ index 648ca5c..867a442 100644
 +  // Leave ordinary 720/1080-line video, interlaced, rotated and 3D video alone.
 +  if (am_private->video_format != VFORMAT_H264 || m_hints.height <= 16 ||
 +      m_hints.height % 8 == 0 || m_hints.interlaced ||
-+      (m_hints.codecOptions & CODEC_INTERLACED) || m_hints.orientation != 0 ||
++      m_hints.orientation != 0 ||
 +      (!m_hints.stereo_mode.empty() && m_hints.stereo_mode != "mono") ||
 +      !m_originalVideoCrop.empty())
 +    return;
