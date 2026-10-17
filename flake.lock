@@ -3,17 +3,17 @@
     "coreelec": {
       "flake": false,
       "locked": {
-        "lastModified": 1785091292,
-        "narHash": "sha256-4pc5PPGYqBbhO8qpfQk6SsrKjfuKQy5UMV1Lfn9blEw=",
+        "lastModified": 1792071862,
+        "narHash": "sha256-C+BcOgkchHbzAOJ0uNnzToZuQtGNro1pW0Ssmsuk/ak=",
         "owner": "CoreELEC",
         "repo": "CoreELEC",
-        "rev": "d854e773674cbb9de658b1f92f2a5c1af02af01d",
+        "rev": "8c82dbaa6160b20806917556979b2dd964a251de",
         "type": "github"
       },
       "original": {
         "owner": "CoreELEC",
         "repo": "CoreELEC",
-        "rev": "d854e773674cbb9de658b1f92f2a5c1af02af01d",
+        "rev": "8c82dbaa6160b20806917556979b2dd964a251de",
         "type": "github"
       }
     },
@@ -88,17 +88,17 @@
     "coreelec-kodi": {
       "flake": false,
       "locked": {
-        "lastModified": 1785091197,
-        "narHash": "sha256-c3GgzR8MSx0z4PyHLH+IONKHNLdsrpumEaowkcsbxJk=",
+        "lastModified": 1792071439,
+        "narHash": "sha256-xUcT3fk9sZqMSRnzlfOjLkNo5LR1hrv2N+/SS1axTkE=",
         "owner": "CoreELEC",
         "repo": "xbmc",
-        "rev": "726799f46fe88ecaca91bfd9a47fa8a748ca4f2e",
+        "rev": "9f61cca98636d13425101779a2cffccbfd964f47",
         "type": "github"
       },
       "original": {
         "owner": "CoreELEC",
         "repo": "xbmc",
-        "rev": "726799f46fe88ecaca91bfd9a47fa8a748ca4f2e",
+        "rev": "9f61cca98636d13425101779a2cffccbfd964f47",
         "type": "github"
       }
     },
