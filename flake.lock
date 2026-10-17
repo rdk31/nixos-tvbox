@@ -37,11 +37,11 @@
     "coreelec-brcm-firmware": {
       "flake": false,
       "locked": {
-        "lastModified": 1783086716,
-        "narHash": "sha256-YQHE0T6Y/Hgc3cOujHUvnQoo7hBJyA4Iuq4nuwt3gCU=",
+        "lastModified": 1786978626,
+        "narHash": "sha256-0BLUtLtULzOeJ7IBgXd4s4mDSNxMAmFrb2VZ0IKdbOA=",
         "owner": "CoreELEC",
         "repo": "brcmfmac_sdio-firmware-aml",
-        "rev": "1d4dfecc010106d651e11c2e25824dcb059e774e",
+        "rev": "6470abe10f2f1f2623914ee19dde5f22201b2231",
         "type": "github"
       },
       "original": {
@@ -54,11 +54,11 @@
     "coreelec-common-drivers": {
       "flake": false,
       "locked": {
-        "lastModified": 1784536543,
-        "narHash": "sha256-++yfy3PDP1eZEYVIaqmkYRmNUrutFUn+fb052wSMxJc=",
+        "lastModified": 1791832005,
+        "narHash": "sha256-yQCtfeYk4JFtJ1R7jkJYNJ3e+yYYB2nxDe8JuSEgNMQ=",
         "owner": "CoreELEC",
         "repo": "common_drivers",
-        "rev": "6e10fef9b78b48060e86ea97a40eb35ddc23b0ca",
+        "rev": "8a89a9aae1cb7c7993cc20b943491af435b31801",
         "type": "github"
       },
       "original": {
@@ -122,11 +122,11 @@
     "coreelec-linux-amlogic": {
       "flake": false,
       "locked": {
-        "lastModified": 1784477513,
-        "narHash": "sha256-oe4ZY8qdxOh14Oz/xuWi7VwZ2N8p+hihvJnizY9GfXw=",
+        "lastModified": 1791803579,
+        "narHash": "sha256-YUvJ7cXkhsVhOatX8HHRkgUS8/jGd9Vd1rvcgZwF428=",
         "owner": "CoreELEC",
         "repo": "linux-amlogic",
-        "rev": "799e6a3d791a34720f5ca89ef95251541e024ab3",
+        "rev": "f231c7811a91c548f86a43e17cf43611f8747c86",
         "type": "github"
       },
       "original": {
@@ -139,11 +139,11 @@
     "coreelec-media-modules-aml": {
       "flake": false,
       "locked": {
-        "lastModified": 1783321590,
-        "narHash": "sha256-v6iAA49gwDlnNCRFGZ5rt7uH2BH0dGg8lKlFq9hFkjE=",
+        "lastModified": 1790578479,
+        "narHash": "sha256-eTnDFEqlQQbtcvFZNOJnPzuTGkhfDtRn/yF1hRRxAls=",
         "owner": "CoreELEC",
         "repo": "media_modules-aml",
-        "rev": "6854cdcd591d4b70acb44c490700355fd8b8c512",
+        "rev": "c15aebb1ac93028d0aceadf8f35dda2204d33424",
         "type": "github"
       },
       "original": {

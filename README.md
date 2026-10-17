@@ -51,6 +51,7 @@ homelab flake:
 ```
 
 The `ugoos-am9-pro` module includes the TV services and S905X5 hardware profile.
+This configuration requires Ugoos firmware older than 2.2.0.
 For another S905X5 board, `nixosModules.amlogic-s905x5` provides that shared
 profile; supply the board's boot, storage, and remote configuration separately.
 The services-only `nixosModules.nixos-tvbox` requires a hardware module that

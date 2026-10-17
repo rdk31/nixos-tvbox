@@ -28,7 +28,16 @@ linuxManualConfig {
   src = composedSource;
   configfile = ./kernel.config;
   target = "Image";
-  inherit features kernelPatches randstructSeed;
+  inherit features randstructSeed;
+  # Stock AM9 firmware before 2.2.0 needs edge-triggered S6 interrupts.
+  # Keep this alongside the newer drivers required by Kodi's Dolby Vision API.
+  kernelPatches = [
+    {
+      name = "s6-legacy-bootloader-irqs";
+      patch = ./s6-legacy-bootloader-irqs.patch;
+    }
+  ]
+  ++ kernelPatches;
   extraMeta = {
     description = "CoreELEC-derived Amlogic 5.15 kernel for the Ugoos AM9 Pro";
     platforms = lib.intersectLists lib.platforms.aarch64 lib.platforms.linux;
