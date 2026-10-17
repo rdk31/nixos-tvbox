@@ -37,5 +37,4 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build package
-        run: >-
-          nix build -L --no-link --no-update-lock-file --max-jobs 1 .#${{ matrix.package }}
+        run: nix build -L --no-link --no-update-lock-file --max-jobs 1 .#${{ matrix.package }}
