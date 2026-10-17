@@ -10,6 +10,14 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      nix:
+      coreelec:
         patterns:
-          - "*"
+          - "coreelec*"
+      nixpkgs:
+        patterns:
+          - "nixpkgs"
+      tooling:
+        patterns:
+          - "flake-parts"
+          - "git-hooks"
+          - "treefmt-nix"

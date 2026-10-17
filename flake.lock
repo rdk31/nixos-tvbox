@@ -12,8 +12,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "coreelec-22",
         "repo": "CoreELEC",
-        "rev": "8c82dbaa6160b20806917556979b2dd964a251de",
         "type": "github"
       }
     },
@@ -29,8 +29,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "linux-5.15",
         "repo": "amremote",
-        "rev": "c979ec379706e023471f28fc49c92633ab9a370a",
         "type": "github"
       }
     },
@@ -46,8 +46,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "master",
         "repo": "brcmfmac_sdio-firmware-aml",
-        "rev": "1d4dfecc010106d651e11c2e25824dcb059e774e",
         "type": "github"
       }
     },
@@ -63,8 +63,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "5.15.196_20260225",
         "repo": "common_drivers",
-        "rev": "6e10fef9b78b48060e86ea97a40eb35ddc23b0ca",
         "type": "github"
       }
     },
@@ -80,8 +80,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "r44p0-5.15.196",
         "repo": "gpu-aml",
-        "rev": "8deb0c1665bfc20fb97e43650510edf3d86b0c00",
         "type": "github"
       }
     },
@@ -97,8 +97,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "aml-5.15.196-22.0",
         "repo": "xbmc",
-        "rev": "9f61cca98636d13425101779a2cffccbfd964f47",
         "type": "github"
       }
     },
@@ -114,8 +114,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "r44p0",
         "repo": "opengl-meson",
-        "rev": "2e7fc9325857953a3ced495b752d42e055bc9ddc",
         "type": "github"
       }
     },
@@ -131,8 +131,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "5.15.196_20260306",
         "repo": "linux-amlogic",
-        "rev": "799e6a3d791a34720f5ca89ef95251541e024ab3",
         "type": "github"
       }
     },
@@ -148,8 +148,8 @@
       },
       "original": {
         "owner": "CoreELEC",
+        "ref": "5.15.196_20260225",
         "repo": "media_modules-aml",
-        "rev": "6854cdcd591d4b70acb44c490700355fd8b8c512",
         "type": "github"
       }
     },

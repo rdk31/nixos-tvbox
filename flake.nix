@@ -5,39 +5,39 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     coreelec = {
-      url = "github:CoreELEC/CoreELEC/8c82dbaa6160b20806917556979b2dd964a251de";
+      url = "github:CoreELEC/CoreELEC/coreelec-22";
       flake = false;
     };
     coreelec-linux-amlogic = {
-      url = "github:CoreELEC/linux-amlogic/799e6a3d791a34720f5ca89ef95251541e024ab3";
+      url = "github:CoreELEC/linux-amlogic/5.15.196_20260306";
       flake = false;
     };
     coreelec-common-drivers = {
-      url = "github:CoreELEC/common_drivers/6e10fef9b78b48060e86ea97a40eb35ddc23b0ca";
+      url = "github:CoreELEC/common_drivers/5.15.196_20260225";
       flake = false;
     };
     coreelec-amremote = {
-      url = "github:CoreELEC/amremote/c979ec379706e023471f28fc49c92633ab9a370a";
+      url = "github:CoreELEC/amremote/linux-5.15";
       flake = false;
     };
     coreelec-brcm-firmware = {
-      url = "github:CoreELEC/brcmfmac_sdio-firmware-aml/1d4dfecc010106d651e11c2e25824dcb059e774e";
+      url = "github:CoreELEC/brcmfmac_sdio-firmware-aml/master";
       flake = false;
     };
     coreelec-libmali = {
-      url = "github:CoreELEC/opengl-meson/2e7fc9325857953a3ced495b752d42e055bc9ddc";
+      url = "github:CoreELEC/opengl-meson/r44p0";
       flake = false;
     };
     coreelec-gpu-aml = {
-      url = "github:CoreELEC/gpu-aml/8deb0c1665bfc20fb97e43650510edf3d86b0c00";
+      url = "github:CoreELEC/gpu-aml/r44p0-5.15.196";
       flake = false;
     };
     coreelec-media-modules-aml = {
-      url = "github:CoreELEC/media_modules-aml/6854cdcd591d4b70acb44c490700355fd8b8c512";
+      url = "github:CoreELEC/media_modules-aml/5.15.196_20260225";
       flake = false;
     };
     coreelec-kodi = {
-      url = "github:CoreELEC/xbmc/9f61cca98636d13425101779a2cffccbfd964f47";
+      url = "github:CoreELEC/xbmc/aml-5.15.196-22.0";
       flake = false;
     };
 
