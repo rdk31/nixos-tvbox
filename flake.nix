@@ -133,11 +133,13 @@
               brcm-firmware-amlogic
               libamcodec
               libmali
+              linux-amlogic
               mali-csf-firmware
               obu-util
               opentee-amlogic
               ;
 
+            kodi-amlogic = targetPkgs.kodi-amlogic.kodi;
             kodi-youtube = targetPkgs.kodi-addons.youtube;
             kodi-frontend-launcher = targetPkgs.kodi-addons.frontend-launcher;
             libbluray = targetPkgs.callPackage ./pkgs/kodi-amlogic/overrides/libbluray.nix {
@@ -145,9 +147,7 @@
             };
           };
 
-          checks =
-            import ./checks { inherit self nixpkgs pkgs; }
-            // lib.optionalAttrs (system == "aarch64-linux") config.packages;
+          checks = import ./checks { inherit self nixpkgs pkgs; };
         };
     };
 }
