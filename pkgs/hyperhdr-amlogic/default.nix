@@ -17,8 +17,6 @@ hyperhdr.overrideAttrs (old: {
   };
   # The v21 unvendoring patch is included upstream in v22.
   patches = [
-    ./fix-amlogic-framebuffer-deadlock.patch
-    ./enable-amlogic-hdr-tone-mapping.patch
     ./video-only-auto-hdr.patch
     ./clear-idle-video.patch
   ];

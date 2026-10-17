@@ -1,8 +1,7 @@
 diff --git a/include/grabber/linux/amlogic/AmlogicGrabber.h b/include/grabber/linux/amlogic/AmlogicGrabber.h
-index 46e9ebf..d26f05e 100644
 --- a/include/grabber/linux/amlogic/AmlogicGrabber.h
 +++ b/include/grabber/linux/amlogic/AmlogicGrabber.h
-@@ -65,6 +65,8 @@ private:
+@@ -82,6 +82,8 @@
  	bool grabFrameFramebuffer();
  	bool getAspectRatio(int& arW, int& arH);
  	bool setCapturedHeight();
@@ -11,7 +10,7 @@ index 46e9ebf..d26f05e 100644
  
  	MemoryBuffer<uint8_t> _amlFrame;
  	MemoryBuffer<uint8_t> _lastValidFrame;
-@@ -73,6 +75,7 @@ private:
+@@ -89,6 +91,7 @@
  	int _videoDev;
  	bool _usingAmlogic;
  	bool _messageShow;
@@ -19,11 +18,24 @@ index 46e9ebf..d26f05e 100644
  		
  private:
  	QString		_configurationPath;
+diff --git a/sources/base/SystemWrapper.cpp b/sources/base/SystemWrapper.cpp
+--- a/sources/base/SystemWrapper.cpp
++++ b/sources/base/SystemWrapper.cpp
+@@ -151,10 +151,8 @@
+ 			// device framerate
+ 			_grabber->setFramerate(obj["fps"].toInt(10));
+ 
+-#ifdef ENABLE_DX
+ 			// HDR tone mapping
+ 			setHdrToneMappingEnabled(obj["hdrToneMapping"].toBool(false) ? 1 : 0);
+-#endif
+ 
+ 			// signal
+ 			_grabber->setSignalDetectionEnable(obj["signalDetection"].toBool(false));
 diff --git a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
-index 9f86430..35ec22c 100644
 --- a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
 +++ b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
-@@ -54,6 +54,7 @@ namespace {
+@@ -60,6 +60,7 @@
  	const int  AMVIDEOCAP_WAIT_MAX_MS = 40;
  	const char DEFAULT_VIDEO_DEVICE[] = "/dev/amvideo";
  	const char DEFAULT_CAPTURE_DEVICE[] = "/dev/amvideocap0";
@@ -31,7 +43,8 @@ index 9f86430..35ec22c 100644
  }
  
  
-@@ -71,5 +72,7 @@ AmlogicGrabber::AmlogicGrabber(const QString& device, const QString& configurati
+@@ -70,6 +71,8 @@
+ 	, _handle(-1)
  {
  	resetVariables();
 +	loadLutFile(PixelFormat::RGB24);
@@ -39,49 +52,46 @@ index 9f86430..35ec22c 100644
  
  	_timer.setTimerType(Qt::PreciseTimer);
  	connect(&_timer, &QTimer::timeout, this, &AmlogicGrabber::grabFrame);
-@@ -99,7 +102,10 @@ void AmlogicGrabber::loadLutFile(PixelFormat color)
- 	QString userLut = QString("%1/lut_lin_tables.3d").arg(_configurationPath);
- 	QString sharedLut = QString("%1/lut_lin_tables.3d").arg(GetSharedLut());
+@@ -90,15 +93,59 @@
  
+ QString AmlogicGrabber::GetSharedLut()
+ {
+-	return "";
++	QFileInfo info(QCoreApplication::applicationDirPath() + "/../lut");
++	return info.absoluteFilePath();
+ }
+ 
+ void AmlogicGrabber::loadLutFile(PixelFormat color)
+ {
++	QString userLut = QString("%1/lut_lin_tables.3d").arg(_configurationPath);
++	QString sharedLut = QString("%1/lut_lin_tables.3d").arg(GetSharedLut());
++
 +	const int activeMode = _hdrToneMappingEnabled;
 +	_hdrToneMappingEnabled = 1;
- 	Grabber::loadLutFile(_log, color, QList<QString>{userLut, sharedLut});
++	Grabber::loadLutFile(_log, color, QList<QString>{userLut, sharedLut});
 +	_hdrToneMappingEnabled = activeMode;
  }
  
  void AmlogicGrabber::setHdrToneMappingEnabled(int mode)
-@@ -106,26 +112,44 @@ void AmlogicGrabber::loadLutFile(PixelFormat color)
- 
- void AmlogicGrabber::setHdrToneMappingEnabled(int mode)
  {
--	if (_hdrToneMappingEnabled != mode || _lut.data() == nullptr)
 +	const bool configured = mode != 0;
 +	if (_hdrToneMappingConfigured != configured || (_lut.data() == nullptr && configured))
- 	{
--		_hdrToneMappingEnabled = mode;
--
--		if (_lut.data() != nullptr || !mode)
--			Debug(_log, "setHdrToneMappingMode to: {:s}", (mode == 0) ? "Disabled" : "Enabled");
--		else
--			Warning(_log, "setHdrToneMappingMode to: enable, but the LUT file is currently unloaded");
++	{
 +		_hdrToneMappingConfigured = configured;
- 
--		loadLutFile(PixelFormat::RGB24);
++
 +		if (configured && _lut.data() == nullptr)
 +			loadLutFile(PixelFormat::RGB24);
 +		updateHdrToneMappingForSource();
- 		emit SignalSetNewComponentStateToAllInstances(
- 			hyperhdr::Components::COMP_HDR,
--			(mode != 0));
++		emit SignalSetNewComponentStateToAllInstances(
++			hyperhdr::Components::COMP_HDR,
 +			configured);
- 	}
- 	else
- 	{
--		Debug(_log, "setHdrToneMappingMode nothing changed: {:s}", (mode == 0) ? "Disabled" : "Enabled");
++	}
++	else
++	{
 +		Debug(_log, "HDR tone mapping configuration unchanged: {:s}", configured ? "Enabled" : "Disabled");
- 	}
- }
- 
++	}
++}
++
 +bool AmlogicGrabber::isHdrOutput()
 +{
 +	QFile status(HDMI_HDR_STATUS);
@@ -100,12 +110,16 @@ index 9f86430..35ec22c 100644
 +		_hdrToneMappingEnabled = active;
 +		Info(_log, "HDR tone mapping is now {:s} for the current HDMI output", active ? "active" : "inactive");
 +	}
-+}
-+
+ }
+ 
  bool AmlogicGrabber::getAspectRatio(int& arW, int& arH)
+@@ -315,12 +362,11 @@
+ 
+ void AmlogicGrabber::grabFrame()
  {
- 	QFile fw("/sys/class/video/frame_width");
-@@ -326,6 +343,7 @@ void AmlogicGrabber::grabFrame()
+-	bool stopNow = false;
+-
+ 	if (_semaphore.tryAcquire()) {
  		try {
  			if (_initialized) {				
  				bool isVideoPlaying = isVideoPlayingAML();
@@ -113,18 +127,22 @@ index 9f86430..35ec22c 100644
  
  				// Change capture device when needed
  				if (isVideoPlaying != _usingAmlogic) {
-@@ -352,13 +370,12 @@ void AmlogicGrabber::grabFrame()
+@@ -353,17 +399,12 @@
  					}
  					grabFrameAmlogic();
  				}
 -				else {
-+				else if (!_messageShow) {
 -					if (!_messageShow)
 -					{
 -						Info(_log, "Grabbing Framebuffer");
 -						_messageShow = true;
 -					}
--					grabFrameFramebuffer();
+-					stopNow = grabFrameFramebuffer();
+-					if (stopNow)
+-					{
+-						uninit();
+-					}
++				else if (!_messageShow) {
 +					Info(_log, "No decoded video is active; suppressing the framebuffer because it is not the Kodi DRM plane");
 +					_messageShow = true;
 +					Image<ColorRgb> black(_width, _height);
@@ -133,3 +151,30 @@ index 9f86430..35ec22c 100644
  				}
  			}
  		}
+diff --git a/sources/utils/FrameDecoder.cpp b/sources/utils/FrameDecoder.cpp
+--- a/sources/utils/FrameDecoder.cpp
++++ b/sources/utils/FrameDecoder.cpp
+@@ -411,7 +411,7 @@
+ 		}
+ 		else while (dLine < dLineEnd)
+ 		{
+-			memcpy(&buffer, &sLine, 3);
++			memcpy(buffer, sLine, 3);
+ 			sLine += divisionX;
+ 			ind_lutd = LUT_INDEX(buffer[2], buffer[1], buffer[0]);
+ 			*((uint32_t*)dLine) = *((uint32_t*)(&_lutBuffer[ind_lutd]));
+diff --git a/www/js/grabber.js b/www/js/grabber.js
+--- a/www/js/grabber.js
++++ b/www/js/grabber.js
+@@ -664,7 +664,10 @@
+ 			else if (window.serverInfo.systemGrabbers.device.indexOf("amlogic")>=0)
+ 				createHint("intro", $.i18n('conf_grabber_amlogic_intro'), "editor_container_system_device");			
+ 
+-			$('[data-schemapath="root.systemGrabber.hdrToneMapping"]').toggle(false);
++			const systemGrabberName = window.serverInfo.systemGrabbers.device;
++			$('[data-schemapath="root.systemGrabber.hdrToneMapping"]').toggle(
++				systemGrabberName.indexOf("DirectX") >= 0 || systemGrabberName.indexOf("amlogic") >= 0
++			);
+ 
+ 			if (window.serverInfo.systemGrabbers.device.indexOf("pipewire")<0)
+ 			{

@@ -1,7 +1,8 @@
 diff --git a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
 --- a/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
 +++ b/sources/grabber/linux/amlogic/AmlogicGrabber.cpp
-@@ -589,6 +589,16 @@
+@@ -629,6 +629,16 @@
+ 
  bool AmlogicGrabber::isVideoPlayingAML()
  {
 +	// An enabled video layer survives decoder teardown. Its capture device can
