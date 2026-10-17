@@ -5,7 +5,7 @@ inputs: final: _prev:
     coreelecSource = inputs.coreelec;
   };
   kodi-amlogic = final.callPackage ../pkgs/kodi-amlogic {
-    src = inputs.coreelec-kodi;
+    src = final.coreelecSources.kodi;
     inherit (final) libamcodec libmali;
     coreelecSource = inputs.coreelec;
     ffmpeg = final.ffmpeg-amlogic;

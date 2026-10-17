@@ -1,16 +1,13 @@
 {
   lib,
   stdenvNoCC,
-  fetchurl,
+  src,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "libamcodec";
-  version = "d28bf07facc8727de52ba1f70c1362f9e19adc25";
-  src = fetchurl {
-    url = "https://sources.coreelec.org/libamcodec-aarch64-${finalAttrs.version}.tar.xz";
-    hash = "sha256-UxNLORJaxcPUM4zeV8bsREFUYo/hfcGoCKmO8XGykU4=";
-  };
+  version = src.rev;
+  inherit src;
 
   sourceRoot = "libamcodec-aarch64-${finalAttrs.version}";
   dontConfigure = true;

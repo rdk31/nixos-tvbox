@@ -8,38 +8,6 @@
       url = "github:CoreELEC/CoreELEC/coreelec-22";
       flake = false;
     };
-    coreelec-linux-amlogic = {
-      url = "github:CoreELEC/linux-amlogic/5.15.196_20260306";
-      flake = false;
-    };
-    coreelec-common-drivers = {
-      url = "github:CoreELEC/common_drivers/5.15.196_20260225";
-      flake = false;
-    };
-    coreelec-amremote = {
-      url = "github:CoreELEC/amremote/linux-5.15";
-      flake = false;
-    };
-    coreelec-brcm-firmware = {
-      url = "github:CoreELEC/brcmfmac_sdio-firmware-aml/master";
-      flake = false;
-    };
-    coreelec-libmali = {
-      url = "github:CoreELEC/opengl-meson/r44p0";
-      flake = false;
-    };
-    coreelec-gpu-aml = {
-      url = "github:CoreELEC/gpu-aml/r44p0-5.15.196";
-      flake = false;
-    };
-    coreelec-media-modules-aml = {
-      url = "github:CoreELEC/media_modules-aml/5.15.196_20260225";
-      flake = false;
-    };
-    coreelec-kodi = {
-      url = "github:CoreELEC/xbmc/aml-5.15.196-22.0";
-      flake = false;
-    };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks = {
@@ -73,6 +41,7 @@
       ];
 
       flake = {
+        lib = nixpkgs.lib.extend (import ./lib);
         overlays.default = import ./overlays inputs;
         nixosModules = {
           nixos-tvbox = {
