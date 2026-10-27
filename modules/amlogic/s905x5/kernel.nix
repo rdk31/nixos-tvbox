@@ -1,10 +1,11 @@
 {
+  lib,
   pkgs,
   ...
 }:
 
 {
-  boot.kernelPackages = pkgs.linuxPackagesForAmlogic pkgs.linux-amlogic;
+  boot.kernelPackages = lib.mkDefault (pkgs.linuxPackagesForAmlogic pkgs.linux-amlogic);
 
   assertions = [
     {

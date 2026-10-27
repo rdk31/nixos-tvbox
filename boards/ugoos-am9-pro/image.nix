@@ -58,5 +58,5 @@
     '';
   };
 
-  image.baseName = "nixos-tvbox-ugoos-am9-pro";
+  image.baseName = lib.mkDefault "nixos-tvbox-ugoos-am9-pro";
 }

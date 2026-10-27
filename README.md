@@ -3,11 +3,22 @@
 NixOS modules for TV boxes with Kodi, hardware video decoding, Dolby Vision,
 Moonlight game streaming, and HyperHDR ambient lighting.
 
+> [!WARNING]
+> **Choose the module matching your Ugoos firmware before building.**
+> The default modules and example below require firmware **2.2.0 or newer**
+> and still need testing on hardware. For firmware **older than 2.2.0**,
+> use the `-legacy` modules instead.
+
 ## Configure your box
 
 The example below targets the Ugoos AM9 Pro (Amlogic S905X5-J), which boots
 from an SD card using stock Ugoos firmware. Add this configuration to your
 homelab flake:
+
+| Ugoos firmware | System module | SD image module |
+| --- | --- | --- |
+| 2.2.0 or newer | `ugoos-am9-pro` | `ugoos-am9-pro-image` |
+| Older than 2.2.0 | `ugoos-am9-pro-legacy` | `ugoos-am9-pro-legacy-image` |
 
 ```nix
 {
@@ -51,7 +62,6 @@ homelab flake:
 ```
 
 The `ugoos-am9-pro` module includes the TV services and S905X5 hardware profile.
-This configuration requires Ugoos firmware older than 2.2.0.
 For another S905X5 board, `nixosModules.amlogic-s905x5` provides that shared
 profile; supply the board's boot, storage, and remote configuration separately.
 The services-only `nixosModules.nixos-tvbox` requires a hardware module that

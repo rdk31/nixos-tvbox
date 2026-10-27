@@ -67,6 +67,19 @@
               ./boards/ugoos-am9-pro/image.nix
             ];
           };
+          ugoos-am9-pro-legacy = {
+            imports = [
+              self.nixosModules.ugoos-am9-pro
+              ./boards/ugoos-am9-pro/legacy.nix
+            ];
+          };
+          ugoos-am9-pro-legacy-image = {
+            imports = [
+              self.nixosModules.ugoos-am9-pro-legacy
+              ./boards/ugoos-am9-pro/image.nix
+            ];
+            image.baseName = "nixos-tvbox-ugoos-am9-pro-legacy";
+          };
         };
       };
 
