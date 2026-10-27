@@ -1,11 +1,11 @@
 {
+  inputs,
   self,
-  nixpkgs,
-  pkgs,
+  ...
 }:
 
 let
-  board = nixpkgs.lib.nixosSystem {
+  board = inputs.nixpkgs.lib.nixosSystem {
     modules = [
       self.nixosModules.ugoos-am9-pro
       { system.stateVersion = "26.05"; }
@@ -32,12 +32,18 @@ let
   };
 in
 {
-  module-evaluation =
-    assert builtins.all (n: builtins.isString n.config.system.build.toplevel.drvPath) [
-      board
-      allFeatures
-      image
-    ];
-    assert builtins.isString image.config.system.build.sdImage.drvPath;
-    pkgs.runCommand "tvbox-module-evaluation" { } "touch $out";
+  flake.nixosConfigurations.ugoos-am9-pro-ci = allFeatures;
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      checks.module-evaluation =
+        assert builtins.all (n: builtins.isString n.config.system.build.toplevel.drvPath) [
+          board
+          allFeatures
+          image
+        ];
+        assert builtins.isString image.config.system.build.sdImage.drvPath;
+        pkgs.runCommand "tvbox-module-evaluation" { } "touch $out";
+    };
 }

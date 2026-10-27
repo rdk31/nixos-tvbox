@@ -5,6 +5,7 @@
 
   gawk,
   kmod,
+  kmodigest,
   kernel,
 }:
 
@@ -21,6 +22,7 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [
     gawk
     kmod
+    kmodigest
   ];
 
   installPhase = ''
@@ -65,6 +67,12 @@ stdenvNoCC.mkDerivation {
 
     install -Dm0444 "$module" \
       "$out/lib/modules/${kernel.modDirVersion}/extra/dovi.ko"
+  '';
+
+  postFixup = ''
+    module="$out/lib/modules/${kernel.modDirVersion}/extra/dovi.ko"
+    kmodigest "$module"
+    chmod 0444 "$module"
   '';
 
   meta = {

@@ -32,6 +32,7 @@
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
+        ./checks.nix
         git-hooks.flakeModule
         treefmt-nix.flakeModule
       ];
@@ -146,8 +147,6 @@
               coreelecSource = coreelec;
             };
           };
-
-          checks = import ./checks { inherit self nixpkgs pkgs; };
         };
     };
 }

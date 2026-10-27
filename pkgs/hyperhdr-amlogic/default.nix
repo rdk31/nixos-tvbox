@@ -21,14 +21,14 @@ hyperhdr.overrideAttrs (old: {
     ./clear-idle-video.patch
   ];
   postPatch = (old.postPatch or "") + ''
-    substituteInPlace cmake/installer_linux.cmake \
-      --replace-fail '"/usr/lib/systemd/system"' '"''${CMAKE_INSTALL_LIBDIR}/systemd/system"'
     substituteInPlace sources/hyperhdr/CMakeLists.txt \
       --replace-fail 'INSTALL_RPATH_USE_LINK_PATH FALSE' 'INSTALL_RPATH_USE_LINK_PATH TRUE'
   '';
   preFixup = (old.preFixup or "") + ''
     qtWrapperArgs+=(--prefix LD_LIBRARY_PATH : "$out/lib")
   '';
+  # PipeWire is disabled, so skip nixpkgs' PipeWire plugin RPATH fixup.
+  postFixup = "";
   postInstall = (old.postInstall or "") + ''
     mkdir -p "$out/lut"
     tar -xJOf "$NIX_BUILD_TOP/$sourceRoot/resources/lut/lut_lin_tables.tar.xz" lut_lin_tables.3d \

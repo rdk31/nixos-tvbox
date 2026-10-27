@@ -3,6 +3,7 @@
   stdenv,
   src,
 
+  kmodigest,
   kernel,
 }:
 
@@ -11,7 +12,7 @@ stdenv.mkDerivation {
   version = src.rev;
   inherit src;
 
-  nativeBuildInputs = kernel.moduleBuildDependencies;
+  nativeBuildInputs = kernel.moduleBuildDependencies ++ [ kmodigest ];
   hardeningDisable = [
     "pic"
     "format"
@@ -52,6 +53,13 @@ stdenv.mkDerivation {
     install -m 0644 firmware/S905X5/video_ucode.bin \
       "$out/lib/firmware/video/S905X5/video_ucode.bin"
     runHook postInstall
+  '';
+
+  # Sign after stripping so the certificates describe the installed modules.
+  postFixup = ''
+    for module in "$out/lib/modules/${kernel.modDirVersion}/extra/media_modules-aml/"*.ko; do
+      kmodigest "$module"
+    done
   '';
 
   meta = {

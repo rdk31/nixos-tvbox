@@ -4,6 +4,7 @@
   src,
 
   kmod,
+  kmodigest,
   kernel,
 }:
 
@@ -13,7 +14,10 @@ stdenv.mkDerivation {
   inherit src;
 
   sourceRoot = "source/valhall/r44p0/kernel/drivers/gpu/arm";
-  nativeBuildInputs = kernel.moduleBuildDependencies ++ [ kmod ];
+  nativeBuildInputs = kernel.moduleBuildDependencies ++ [
+    kmod
+    kmodigest
+  ];
   hardeningDisable = [
     "pic"
     "format"
@@ -52,6 +56,10 @@ stdenv.mkDerivation {
       | grep -q 'of:N.*T.*Carm,mali-valhall-csf'
 
     runHook postInstall
+  '';
+
+  postFixup = ''
+    kmodigest "$out/lib/modules/${kernel.modDirVersion}/extra/gpu-aml/mali_kbase.ko"
   '';
 
   meta = {

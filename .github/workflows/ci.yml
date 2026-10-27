@@ -20,13 +20,9 @@ jobs:
         run: nix flake check -L --no-update-lock-file
 
   build:
-    name: build ${{ matrix.package }}
+    name: build system
     needs: check
     runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        package: [linux-amlogic, kodi-amlogic]
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@main
@@ -36,5 +32,5 @@ jobs:
             extra-trusted-public-keys = flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Build package
-        run: nix build -L --no-link --no-update-lock-file --max-jobs 1 .#${{ matrix.package }}
+      - name: Build system
+        run: nix build -L --no-link --no-update-lock-file --max-jobs 1 .#nixosConfigurations.ugoos-am9-pro-ci.config.system.build.toplevel
