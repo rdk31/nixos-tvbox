@@ -1,32 +1,16 @@
 {
   lib,
   hyperhdr,
-  fetchFromGitHub,
   openssl,
   zstd,
 }:
 
 hyperhdr.overrideAttrs (old: {
   pname = "hyperhdr-amlogic";
-  version = "22.0.0.0";
-  src = fetchFromGitHub {
-    owner = "awawa-dev";
-    repo = "HyperHDR";
-    tag = "v22.0.0.0";
-    hash = "sha256-si39Q5XaZHGAFEU2sqU60+5kPYVPnTAoPaiyWD1Dlvs=";
-  };
-  # The v21 unvendoring patch is included upstream in v22.
-  patches = [
+  patches = (old.patches or [ ]) ++ [
     ./video-only-auto-hdr.patch
     ./clear-idle-video.patch
   ];
-  postPatch = (old.postPatch or "") + ''
-    substituteInPlace sources/hyperhdr/CMakeLists.txt \
-      --replace-fail 'INSTALL_RPATH_USE_LINK_PATH FALSE' 'INSTALL_RPATH_USE_LINK_PATH TRUE'
-  '';
-  preFixup = (old.preFixup or "") + ''
-    qtWrapperArgs+=(--prefix LD_LIBRARY_PATH : "$out/lib")
-  '';
   # PipeWire is disabled, so skip nixpkgs' PipeWire plugin RPATH fixup.
   postFixup = "";
   postInstall = (old.postInstall or "") + ''

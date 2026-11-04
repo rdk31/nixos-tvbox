@@ -22,7 +22,7 @@ let
     chmod -R u+w $out/common_drivers
   '';
 in
-linuxManualConfig {
+(linuxManualConfig {
   pname = "linux-amlogic-ugoos-am9-pro";
   inherit version;
   modDirVersion = version;
@@ -45,4 +45,15 @@ linuxManualConfig {
     platforms = lib.intersectLists lib.platforms.aarch64 lib.platforms.linux;
     license = lib.licenses.gpl2Only;
   };
-}
+}).overrideAttrs
+  (old: {
+    # nixpkgs now assumes Linux >= 5.19. Keep its deterministic randstruct seed
+    # handling, but patch the script used by this vendor 5.15 kernel.
+    patches = map (
+      patch:
+      if builtins.baseNameOf patch == "randstruct-provide-seed-5.19.patch" then
+        ./randstruct-provide-seed.patch
+      else
+        patch
+    ) old.patches;
+  })
