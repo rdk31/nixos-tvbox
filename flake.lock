@@ -3,11 +3,11 @@
     "coreelec": {
       "flake": false,
       "locked": {
-        "lastModified": 1793452837,
-        "narHash": "sha256-R6HD0gUjHqQaZg79tiO1nZ6f3NACy33LcViMKQuZptc=",
+        "lastModified": 1793807772,
+        "narHash": "sha256-Ka0V3nLZSJvLTyHxKYI+y5VKh+EnUqXMiHvrPPEwbnU=",
         "owner": "CoreELEC",
         "repo": "CoreELEC",
-        "rev": "98a729b80ece21a7ceb8dbab127a6d19a6cff60a",
+        "rev": "79f7c6c453922d6666b67285f532ba2f816b052d",
         "type": "github"
       },
       "original": {
