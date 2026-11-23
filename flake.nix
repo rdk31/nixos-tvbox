@@ -131,7 +131,10 @@
             programs = {
               deadnix.enable = true;
               nixfmt.enable = true;
-              shfmt.enable = true;
+              shfmt = {
+                enable = true;
+                indent_size = 2;
+              };
               statix.enable = true;
             };
           };
