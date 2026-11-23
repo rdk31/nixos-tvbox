@@ -43,6 +43,31 @@ static uint32_t property(int fd, uint32_t id, uint32_t type,
     return result;
 }
 
+/* Return the property to restore only when this session changed it. */
+static uint32_t request_allm(int fd, uint32_t connector, uint64_t *previous)
+{
+    uint64_t supported = 0;
+    uint32_t allm = property(fd, connector, DRM_MODE_OBJECT_CONNECTOR, "allm", previous);
+    if (!allm || !property(fd, connector, DRM_MODE_OBJECT_CONNECTOR, "allm_cap", &supported)) {
+        fprintf(stderr, "HDMI connector has no ALLM controls\n");
+        return 0;
+    }
+    if (!supported) {
+        fprintf(stderr, "HDMI display does not advertise ALLM\n");
+        return 0;
+    }
+    if (*previous == 1) {
+        fprintf(stderr, "HDMI ALLM already enabled\n");
+        return 0;
+    }
+    if (drmModeObjectSetProperty(fd, connector, DRM_MODE_OBJECT_CONNECTOR, allm, 1) < 0) {
+        perror("request HDMI ALLM");
+        return 0;
+    }
+    fprintf(stderr, "HDMI ALLM requested for streaming\n");
+    return allm;
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 6 || strcmp(argv[4], "--")) {
@@ -53,6 +78,8 @@ int main(int argc, char **argv)
     int result = 1, fd = drmOpen("meson", NULL);
     uint32_t connector = 0, crtc = 0, plane = 0, alpha = 0, fb = 0;
     uint64_t saved_alpha = 0;
+    uint32_t restore_allm = 0;
+    uint64_t saved_allm = 0;
     int crtc_index = -1, activated = 0, alpha_changed = 0;
     char saved_axis[128] = {0};
     int axis_changed = 0;
@@ -163,12 +190,13 @@ int main(int argc, char **argv)
         goto done;
     }
     axis_changed = 1;
-    fprintf(stderr, "HDMI active: %s; starting %s\n", mode.name, argv[5]);
     struct sigaction action = {.sa_handler = stop};
     sigemptyset(&action.sa_mask);
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGINT, &action, NULL);
     sigaction(SIGHUP, &action, NULL);
+    restore_allm = request_allm(fd, connector, &saved_allm);
+    fprintf(stderr, "HDMI active: %s; starting %s\n", mode.name, argv[5]);
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork frontend");
@@ -178,6 +206,8 @@ int main(int argc, char **argv)
         signal(SIGTERM, SIG_DFL);
         signal(SIGINT, SIG_DFL);
         signal(SIGHUP, SIG_DFL);
+        if (stopping)
+            _exit(128 + stopping);
         execvp(argv[5], &argv[5]);
         perror("exec frontend");
         _exit(127);
@@ -194,6 +224,9 @@ int main(int argc, char **argv)
     if (waited == pid)
         result = WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
 done:
+    if (restore_allm &&
+        drmModeObjectSetProperty(fd, connector, DRM_MODE_OBJECT_CONNECTOR, restore_allm, saved_allm) < 0)
+        perror("restore HDMI ALLM");
     if (axis_changed) {
         FILE *restore = fopen("/sys/class/video/axis", "w");
         if (restore) {
