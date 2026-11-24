@@ -57,8 +57,8 @@ let
           "h265"
           "hevc"
         ];
-        default = "h264";
-        description = "Requested video codec; H.264 is the reliable default for the Amlogic backend.";
+        default = "h265";
+        description = "Preferred video codec. Moonlight also offers H.264 when requesting HEVC.";
       };
       audioDevice = lib.mkOption {
         type = singleLine;
